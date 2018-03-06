@@ -1,8 +1,52 @@
 #include <stdio.h>
 #define MAXSIZE 4096
 
+//nextChar returns the next character in string
+char nextChar(char *str) {
+  return *(str + sizeof(char));
+}
 
-// UPDATES TO FILE HERE !!!!!!!!!!
+//prevChar return the previous char in string
+char prevChar(char *str) {
+  return *(str - sizeof(char));
+}
+
+/**
+ TODO
+ int isOperator(char pattern)
+ switch function to return type of operator.
+ .,+,?,\\
+ 
+ 
+/*
+  plus function returns true if char = + symbol
+  uses nextChar to cycle through string
+*/
+int plus(char *pattern) {
+  if (nextChar(pattern) == '+')
+  	return 1;
+  return 0;
+}
+
+/*
+  question Function returns true if char = ? symbol
+  uses nextchar to cycle through
+*/
+int question(char *pattern) {
+  if (nextChar(pattern) == '\?')
+  	return 1;
+  return 0;
+}
+
+/*
+  escape function returns true if char = //
+  uses prevchar to cycle through
+*/
+int escape (char *pattern) {
+  if (prevChar(pattern) == '\\')
+  	return 1;
+  return 0;
+}
 
 /**
  * You can use this recommended helper function 
