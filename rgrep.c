@@ -15,9 +15,16 @@ int matches_leading(char *partial_line, char *pattern) {
   	return 1;
   if (*pattern == '.' && !escape(pattern))
   	return 1; 
+  if (*pattern == '\\')
+  	return matches_leading(partial_line, pattern + sizeof(char));
+  if (question(pattern))
+  	return 1;
+  
 */
   return 0;
 }
+
+
 
 /**
  * You may assume that all strings are properly null terminated 
