@@ -1,52 +1,6 @@
 #include <stdio.h>
 #define MAXSIZE 4096
 
-//nextChar returns the next character in string
-char nextChar(char *str) {
-  return *(str + sizeof(char));
-}
-
-//prevChar return the previous char in string
-char prevChar(char *str) {
-  return *(str - sizeof(char));
-}
-
-/**
- TODO
- int isOperator(char pattern)
- switch function to return type of operator.
- .,+,?,\\
- 
- 
-/*
-  plus function returns true if char = + symbol
-  uses nextChar to cycle through string
-*/
-int plus(char *pattern) {
-  if (nextChar(pattern) == '+')
-  	return 1;
-  return 0;
-}
-
-/*
-  question Function returns true if char = ? symbol
-  uses nextchar to cycle through
-*/
-int question(char *pattern) {
-  if (nextChar(pattern) == '\?')
-  	return 1;
-  return 0;
-}
-
-/*
-  escape function returns true if char = //
-  uses prevchar to cycle through
-*/
-int escape (char *pattern) {
-  if (prevChar(pattern) == '\\')
-  	return 1;
-  return 0;
-}
 
 /**
  * You can use this recommended helper function 
@@ -54,20 +8,57 @@ int escape (char *pattern) {
  * the first char of partial_line.
  */
 int matches_leading(char *partial_line, char *pattern) {
-  // Implement if desire 
-  if(*partial_line == *pattern)
-  	return 1;
-  	/*
-  if (*pattern == '.' && !escape(pattern))
-  	return 1;
-  if (*pattern == '.' && !escape(pattern))
-  	return 1; 
-  if (*pattern == '\\')
-  	return matches_leading(partial_line, pattern + sizeof(char));
-  if (question(pattern))
-  	return 1;
+
+  int i,j,count;
   
-*/
+  i = j = count = 0;
+  
+  //Check for Null Terminator return 0
+  while (pattern[j] == '\0'){
+  	if (partial_line[j] == '\0'){
+  		return 0;
+  	}
+  	
+  	else if (partial_line[j] == '\n'){j++;} //if new-line increase j++ to jump line
+  	
+  	//Condition Checking
+  	if (pattern[i+1] == '\\' && pattern[i] == '\\')
+		{
+			if (pattern[i+1] == partial_line[j])
+			{
+				i+=2; //next char of pattern
+				j++; //next char of partial_line
+			}
+			else
+			{
+				i = 0; //Reset pattern 0
+				j++; //Next partial_line
+			}
+		}
+		
+  	else if(pattern[i] == '\\' && pattern [i+1] = '+'){ // Move to next char on in both arrays
+  		if(pattern[i] == partial_line[j]){  		
+        	i++;
+        	j++;
+       		}       		
+       		else {
+        	i = 0; // Reset pattern back to 0
+        	j++; // Move to next char in partial_line
+        	}
+        }
+        
+        else if (pattern[i] == '\\' && pattern[i+1] == '\\'){
+        	if (pattern[i+1] == partial_line[j]){
+        		j++; // Next char of Partial_line
+        		i+=2; // next char of pattern.
+        	}
+        	else{ // Reset and Move
+        		i = 0; //reset pattern
+        		j++; // move partial_line
+        	}
+        }
+        
+        
   return 0;
 }
 
@@ -81,12 +72,20 @@ int matches_leading(char *partial_line, char *pattern) {
  */
 int rgrep_matches(char *line, char *pattern) {
 
-    //
-    // Implement me 
-    //
+  int i=0;
+  
+  //Performs error checking and makes call to matches_leading
+  while(line[i] != '\0'){
+  	if(matches_leading(line+i, pattern))
+		return 1;
+	i++;
+  }
 
-    return 0;
+	if(pattern[0] == '\0')
+		return 1;
+    return 0;  
 }
+
 
 int main(int argc, char **argv) {
     if (argc != 2) {
