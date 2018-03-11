@@ -72,8 +72,8 @@ int matches_leading(char *partial_line, char *pattern) {
  */
 int rgrep_matches(char *line, char *pattern) {
 
-  int i=0;
-  
+  //int i=0;  
+  /*
   //Performs error checking and makes call to matches_leading
   while(line[i] != '\0'){
   	if(matches_leading(line+i, pattern))
@@ -83,6 +83,63 @@ int rgrep_matches(char *line, char *pattern) {
 
 	if(pattern[0] == '\0')
 		return 1;
+		*/
+		
+  int i = 0;
+  int res = 0; // return value
+  bool flag = false; // condition flag
+  
+  //Test for symbol chars "? and \"
+  while (pattern [i] != '\0') {  // While not null
+  	if ((pattern[i] == '\\' || (pattern[i] == '?'))  // Check for the chars and set flag true
+  		flag = true;
+  	i++; // Increment i to loop through pattern
+  }
+  
+  // Cant use strlen so looped to get size of pattern
+  int length = 0;  
+    while(pattern[length]!='\0')  
+    {
+        length++;        
+    }
+  
+  if (flag)
+	return matches_leading(line,pattern);
+// Find symbols		
+  else{
+  	i = 0;
+  	if (pattern [i] == '?' || pattern [i-1] != '\\'){
+  		char symbols[length-2];
+  		char fullstr[length-1];
+  		int s1, s2;
+  		s1 = s2 = 0;
+  		
+  		
+  		// Will Loop Through to assign pattern to fullstr 
+  		while (pattern[s1] != '\0'){
+  			if (pattern[s1] == '?')
+  				s1++;
+  				
+  			fullstr[s2] = pattern[s1];
+  			s1++;
+  			s2++;
+  			
+  		}
+  		s1 = s2 = 0;
+  		// Will Loop Through to assign pattern without '?' 
+  		while (pattern [s1] != '\0') {
+  			if (pattern [s1+1] == '?')  // check for double '?'
+  				s1 += 2; // skip both
+  			symbols[s2] = pattern[s1];	
+  			s1++;
+  			s2++;
+  		}	
+  		
+  		// If either true return true;
+  		if ((matches_leading(line, symbols) == 1) || (matches_leading(line, fullstr) == 1))		
+  			return 1;
+  	}
+  }		
     return 0;  
 }
 
