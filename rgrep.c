@@ -9,12 +9,12 @@
  */
 int matches_leading(char *partial_line, char *pattern) {
 
-  int i,j,count;
+  int i,j,count;  // Index's to traverse partial_line and pattern seperately
   
   i = j = count = 0;
   
   //Check for Null Terminator return 0
-  while (pattern[j] == '\0'){
+  while (pattern[j] == '\0') {
   	if (partial_line[j] == '\0'){
   		return 0;
   	}
@@ -22,21 +22,19 @@ int matches_leading(char *partial_line, char *pattern) {
   	else if (partial_line[j] == '\n'){j++;} //if new-line increase j++ to jump line
   	
   	//Condition Checking
-  	if (pattern[i+1] == '\\' && pattern[i] == '\\')
+  	else if (pattern[i+1] == '\\' && pattern[i] == '\\')  // check '\\'
 		{
-			if (pattern[i+1] == partial_line[j])
-			{
+			if (pattern[i+1] == partial_line[j]) {
 				i+= 2; //next char of pattern
 				j++; //next char of partial_line
 			}
-			else
-			{
+			else {
 				i = 0; //Reset pattern 0
 				j++; //Next partial_line
 			}
 		}
 		
-  	else if(pattern[i] == '\\' && pattern [i+1] = '+'){ // Move to next char on in both arrays
+  	else if(pattern[i] == '\\' && pattern [i+1] == '+'){ //check '\+'
   		if(pattern[i] == partial_line[j]){  		
         		i++;
         		j++;
@@ -47,7 +45,7 @@ int matches_leading(char *partial_line, char *pattern) {
         	}
         }
         
-        else if (pattern[i] == '?' && pattern[i-1] == '\\') {
+        else if (pattern[i] == '?' && pattern[i-1] == '\\') { // check '\?'
         	if (pattern[i] == partial_line[j]){
         		i++; // next char in pattern
         		j++; // next char in parial_line
@@ -57,7 +55,7 @@ int matches_leading(char *partial_line, char *pattern) {
         		j++;  // increase partial_line
         	}		
         }
-        else if (patern[i] == '.' && pattern [i-1] == '\\') {
+        else if (patern[i] == '.' && pattern [i-1] == '\\') { // check '\.'
         	if (pattern[i] == partial_line[j]) {
         		i++; // next char in pattern
         		j++;  // next char in partial_line
@@ -65,9 +63,32 @@ int matches_leading(char *partial_line, char *pattern) {
         	else {
         		i = 0; // reset pattern
         		j++; // inscrease partial
+        	}
+        	// check for '\' only
+        else if(pattern[i] == '\\' && (pattern[i+1] != '+' || pattern [i+1] != '.' || pattern[i+1] != '?'|| pattern[i+1] != '\\')) {
+        	if  (pattern [i+1] == partial_line[j]) {
+        		i += 2;  // Jump 2 Chars of pattern
+        		j++;  // Increase Partial
         	}		
-        
-  return 0;
+        	else {
+        		i = 0; // reset
+        		j++
+        	}
+        else if((pattern[i] == '+') && (pattern[i-1] !='\\')) { // check for '+' only
+        	count++;
+        	char temp = pattern[i-1]; // sets temp to char before '+' symbol.
+        	// '.' special case
+        	if (temp == '.') // if previous char is '.'
+        		temp = partial_line[j];  // Sets temp to current char
+        		
+        	while (temp == partial_line[j])// Go through all matches.
+        		j++;         	
+        }
+        else
+        	return 0; // no matches found	
+  }
+        	
+  return 1;
 }
 
 
