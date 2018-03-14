@@ -26,7 +26,7 @@ int matches_leading(char *partial_line, char *pattern) {
 		{
 			if (pattern[i+1] == partial_line[j])
 			{
-				i+=2; //next char of pattern
+				i+= 2; //next char of pattern
 				j++; //next char of partial_line
 			}
 			else
@@ -38,26 +38,34 @@ int matches_leading(char *partial_line, char *pattern) {
 		
   	else if(pattern[i] == '\\' && pattern [i+1] = '+'){ // Move to next char on in both arrays
   		if(pattern[i] == partial_line[j]){  		
-        	i++;
-        	j++;
+        		i++;
+        		j++;
        		}       		
        		else {
-        	i = 0; // Reset pattern back to 0
-        	j++; // Move to next char in partial_line
+        		i = 0; // Reset pattern back to 0
+        		j++; // Move to next char in partial_line
         	}
         }
         
-        else if (pattern[i] == '\\' && pattern[i+1] == '\\'){
-        	if (pattern[i+1] == partial_line[j]){
-        		j++; // Next char of Partial_line
-        		i+=2; // next char of pattern.
+        else if (pattern[i] == '?' && pattern[i-1] == '\\') {
+        	if (pattern[i] == partial_line[j]){
+        		i++; // next char in pattern
+        		j++; // next char in parial_line
         	}
-        	else{ // Reset and Move
-        		i = 0; //reset pattern
-        		j++; // move partial_line
-        	}
+        	else{
+        		i = 0;  // reset pattern to 0
+        		j++;  // increase partial_line
+        	}		
         }
-        
+        else if (patern[i] == '.' && pattern [i-1] == '\\') {
+        	if (pattern[i] == partial_line[j]) {
+        		i++; // next char in pattern
+        		j++;  // next char in partial_line
+        	}
+        	else {
+        		i = 0; // reset pattern
+        		j++; // inscrease partial
+        	}		
         
   return 0;
 }
