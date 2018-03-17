@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <string.h>
+#include <string.h> //strlen
 #define MAXSIZE 4096
 
 
@@ -23,16 +23,8 @@ int matches_leading(char *partial_line, char *pattern) {
   	
   	else if (partial_line[j] == '\n'){j++;} //if new-line increase j++ to jump line
   	
-  	//Condition Checking
-  	else if (pattern[i] != partial_line[j]) {
+  	//Condition Checking  	
 		
-			i = 0; //reset pattern to 0
-			j++; //increment partial_line
-	}
-	else if (pattern[i] == '\\') {
-		
-			i++;
-	}	
   	else if (pattern[i] == '\\' && pattern[i+1] == '\\') {  // check '\\'
 		
 			if (pattern[i+1] == partial_line[j]) {
@@ -111,11 +103,20 @@ int matches_leading(char *partial_line, char *pattern) {
 			i++; // increase pattern
 			j++; // increase partial_line
 	}
-	else if (pattern[i] != partial_line[j]) {
+	else if (pattern[i] != partial_line[j]) { 
 		
 			i = 0; //reset pattern to s0
 			j++; // inscrease partial_line
 	}	
+	else if (pattern[i] == '\\') {
+		
+			i++;
+	}	
+	else if (pattern[i] != partial_line[j]) {
+		
+			i = 0; //reset pattern to 0
+			j++; //increment partial_line
+	}
         else
         	return 0; // no matches found	
         	
@@ -166,14 +167,14 @@ int rgrep_matches(char *line, char *pattern) {
   		int s1, s2;  // to traverse strings
   		s1 = s2 = 0;
   		
-  		
-  		// Will Loop Through to assign pattern to fullstr 
+  		//if ((matches_leading(symbols)) || (matches_leading (fullstr)))
+  		// Will Loop Through to copy pattern to fullstr 
   		while (pattern[s1] != '\0'){
   			if (pattern[s1] == '?'){
   				s1++;
   			}
   				
-  			fullstr[s2] = pattern[s1];  			
+  			fullstr[s2] = pattern[s1];  // copies pattern			
   			s1++;
   			s2++;  			
   		}
@@ -182,9 +183,9 @@ int rgrep_matches(char *line, char *pattern) {
   		// Will Loop Through to assign pattern without '?' 
   		while (pattern [s1] != '\0') {
   			if (pattern [s1+1] == '?') { // check for double '?'
-  				s1 += 2; // skip both
+  				s1 += 2; // skip both chars
   			}	
-  			symbols[s2] = pattern[s1];	
+  			symbols[s2] = pattern[s1];	// assigns string minus '?' 
   			s1++;
   			s2++;
   		}	
@@ -194,7 +195,7 @@ int rgrep_matches(char *line, char *pattern) {
 		symbolsRet = matches_leading(line, symbols);
 		fullstrRet = matches_leading(line, fullstr);
 			
-		if (symbolsRet == 1 || fullstrRet == 1)		
+		if (symbolsRet == 1|| fullstrRet == 1)		
 			res = 1;
 		
   		// If either true return true;
