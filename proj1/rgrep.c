@@ -12,9 +12,11 @@ int matches_leading(char *partial_line, char *pattern) {
 
   int i,j,count;  // Index's to traverse partial_line and pattern seperately  
   i = j = count = 0;
+  int patternLength = strlen(pattern);
+  int lineLength = strlen(partial_line);
   
   //Check for Null Terminator return 0
-  while (pattern[i] == '\0') {
+  while (pattern[i] != '\0') {
   	if (partial_line[j] == '\0'){
   		return 0;  // No match
   	}
@@ -22,8 +24,17 @@ int matches_leading(char *partial_line, char *pattern) {
   	else if (partial_line[j] == '\n'){j++;} //if new-line increase j++ to jump line
   	
   	//Condition Checking
-  	else if (pattern[i+1] == '\\' && pattern[i] == '\\')  // check '\\'
-		{
+  	else if (pattern[i] != partial_line[j]) {
+		
+			i = 0; //reset pattern to 0
+			j++; //increment partial_line
+	}
+	else if (pattern[i] == '\\') {
+		
+			i++;
+	}	
+  	else if (pattern[i] == '\\' && pattern[i+1] == '\\') {  // check '\\'
+		
 			if (pattern[i+1] == partial_line[j]) {
 				i+= 2; //next char of pattern
 				j++; //next char of partial_line
@@ -32,7 +43,7 @@ int matches_leading(char *partial_line, char *pattern) {
 				i = 0; //Reset pattern 0
 				j++; //Next partial_line
 			}
-		}
+	}
 		
   	else if(pattern[i-1] == '\\' && pattern [i] == '+'){ //check '\+'
   		if(pattern[i] == partial_line[j]){  		
@@ -77,7 +88,7 @@ int matches_leading(char *partial_line, char *pattern) {
         	}
         }
         	
-        else if((pattern[i] == '+') && (pattern[i-1] !='\\')) { // check for '+' only
+        else if(pattern[i] == '+' && pattern[i-1] != '\\') { // symbol before plus something other than '\'
         	count++;
         	char temp = pattern[i-1]; // sets temp to char before '+' symbol.
         	// '.' special case
@@ -88,17 +99,26 @@ int matches_leading(char *partial_line, char *pattern) {
         		j++;
         		
         	i++; // next char in pattern
-        	int patternLength = strlen(pattern);
-        	int lineLength = strlen(partial_line);
         	
-        	while((pattern[i] == temp) &&((patternLength - count) < (lineLength))) {
+        	
+        	while((pattern[i] == temp) &&((patternLength - count) < (lineLength))) {  // skip next char
         		i++;
         	}	
         		         	
         }
-        
+        else if ((pattern[i] == partial_line[j]) || (pattern[i] == '.' && pattern[i-1] != '\\' && partial_line[j+1] != '\0')) { //'.'  checks ahead for a null terminator
+		
+			i++; // increase pattern
+			j++; // increase partial_line
+	}
+	else if (pattern[i] != partial_line[j]) {
+		
+			i = 0; //reset pattern to s0
+			j++; // inscrease partial_line
+	}	
         else
         	return 0; // no matches found	
+        	
   }
         	
   return 1;
@@ -113,27 +133,14 @@ int matches_leading(char *partial_line, char *pattern) {
  * Implementation of the rgrep matcher function
  */
 int rgrep_matches(char *line, char *pattern) {
-
-  //int i=0;  
-  /*
-  //Performs error checking and makes call to matches_leading
-  while(line[i] != '\0'){
-  	if(matches_leading(line+i, pattern))
-		return 1;
-	i++;
-  }
-
-	if(pattern[0] == '\0')
-		return 1;
-		*/
-		
+	
   int i = 0;
   int res = 0; // return value
   int flag = 1; // condition flag
   
   //Test for symbol chars "? and \"
   while (pattern [i] != '\0') {  // While not null
-  	if (pattern[i] == '\\' || pattern[i] == '?') { // Check for the chars and set flag 1
+  	if (pattern[i] == '\\' || pattern[i] == '?') { // Check for the chars and set flag 0
   		flag = 0;
   	}
   		
@@ -142,58 +149,61 @@ int rgrep_matches(char *line, char *pattern) {
     
  
   
-  if (flag == 1) {
+  if (flag == 1) { // if no symbols except for '.' and '+'
 	res = matches_leading(line,pattern);
   }
   	
-  if (pattern[i] == '?' && pattern[i-1] == '\\')  {
-  	res = matches_leading(line,pattern);
-  }	
+
   		
-// Find symbols		
+// Find symbols	'?' and '\'	
   else{
   	i = 0;
   	if (pattern [i] == '?' || pattern [i-1] != '\\'){
-  		
-  		char symbols[strlen(pattern)-2];  // without char
+  	
   		char fullstr[strlen(pattern)-1];  // Full string
-  		int s1, s2;
+  		char symbols[strlen(pattern)-2];  // without chars
+  		
+  		int s1, s2;  // to traverse strings
   		s1 = s2 = 0;
   		
   		
   		// Will Loop Through to assign pattern to fullstr 
   		while (pattern[s1] != '\0'){
-  			if (pattern[s1] == '?')
+  			if (pattern[s1] == '?'){
   				s1++;
+  			}
   				
-  			fullstr[s2] = pattern[s1];
+  			fullstr[s2] = pattern[s1];  			
   			s1++;
-  			s2++;
-  			
+  			s2++;  			
   		}
+  		
   		s1 = s2 = 0;
   		// Will Loop Through to assign pattern without '?' 
   		while (pattern [s1] != '\0') {
-  			if (pattern [s1+1] == '?')  // check for double '?'
+  			if (pattern [s1+1] == '?') { // check for double '?'
   				s1 += 2; // skip both
+  			}	
   			symbols[s2] = pattern[s1];	
   			s1++;
   			s2++;
   		}	
   		
-  		int return_with_char = 0; 
-		int return_without_char = 0;
-		return_without_char = matches_leading(line, symbols);
-		return_with_char = matches_leading(line, fullstr);
+  		int symbolsRet = 0; 
+		int fullstrRet = 0;
+		symbolsRet = matches_leading(line, symbols);
+		fullstrRet = matches_leading(line, fullstr);
 			
-		if (return_without_char || return_with_char)
-		{
+		if (symbolsRet == 1 || fullstrRet == 1)		
 			res = 1;
-		}
+		
   		// If either true return true;
   		//if ((matches_leading(line, symbols) == 1) || (matches_leading(line, fullstr) == 1))		
   			//return 1;
   	}
+  	  if (pattern[i] == '?' && pattern[i-1] == '\\')  {
+  	  	res = matches_leading(line,pattern);
+  	  }	
   	
   }		
     return res;  
